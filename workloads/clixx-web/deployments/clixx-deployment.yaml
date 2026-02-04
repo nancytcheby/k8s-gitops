@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clixx-web-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: clixx-web-app
+  template:
+    metadata:
+      labels:
+        app: clixx-web-app
+    spec:
+      containers:
+        - name: clixx-web-app
+          image: 818760291841.dkr.ecr.us-east-1.amazonaws.com/clixx-repository:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: DB_HOST
+              value: "wordpressdb-k8s.cc7es6q2474e.us-east-1.rds.amazonaws.com"
+            - name: DB_NAME
+              value: "wordpressdb"
+      imagePullSecrets:
+        - name: ecr-secret
